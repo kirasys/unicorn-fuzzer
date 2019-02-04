@@ -5,12 +5,12 @@ const char* INDEX_FILE_NAME = "_index.json";
 AflUnicornEngine::AflUnicornEngine(const char* context_dir, bool enable_trace, bool debug_trace){
     DEBUG("Loading process context");
         
-    // Making index file full path
+    // Making full path of index file
     std::string index_dir(context_dir);
     index_dir.append("/");
     index_dir.append(INDEX_FILE_NAME);
         
-    // Read json file
+    // Read _index.json file
     Json::Value context;
     std::ifstream index_file(index_dir.c_str());
     index_file >> context;
