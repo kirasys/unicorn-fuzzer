@@ -23,7 +23,11 @@ AflUnicornEngine::AflUnicornEngine(const char* context_dir, bool enable_trace, b
         
     // Only support ARCH_86 & MODE_32 now
     uc_open(UC_ARCH_X86, UC_MODE_32, &uc);
-        
+    
+    // Load the registers
     std::cout << context["regs"];
-        
+    std::map<char*, int> reg_map = AflUnicornEngine::_get_register_map(X86);
+    
+    std::cout << reg_map["eax"];
+    
 }
