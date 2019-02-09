@@ -6,9 +6,9 @@
 #include <fstream>
 #include <string>
 #include <unicorn/unicorn.h>
-#include <json/value.h>
-#include <jsoncpp/json/json.h>
+#include <nlohmann/json.hpp>
 #include <map>
+#include <cstdint>
 
 #define DEBUG(x) do { \
   if (debug_trace) { std::cerr << x << std::endl; } \
@@ -16,13 +16,16 @@
 
 #define X86 0
 
+using json = nlohmann::json;
+
 class AflUnicornEngine{
 private:
     uc_engine *uc;
     
 public:
     AflUnicornEngine(const char* context_dir, bool enable_trace=false, bool debug_trace=false);
-    std::map<char*, int> _get_register_map(int arch);
+    void _map_segments(const json& segment_list, const char* context_dir);
+    std::map<std::string, int> _get_register_map(int arch);
 };
 
 #endif

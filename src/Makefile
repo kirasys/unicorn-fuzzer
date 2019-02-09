@@ -1,11 +1,10 @@
 CC = g++
 LD = ld
-CFLAGS  = -g -w -std=c++11
-CFLAGS += -L ../afl-window/unicorn -I ../afl-window/unicorn/include
-CFLAGS += -L /usr/lib -I /usr/include/jsoncpp
+CFLAGS  = -g -W -std=c++11
+CFLAGS += -L ../lib -I ../include
 
 LDLIBS  = -pthread
-LDLIBS += -lunicorn -ljsoncpp
+LDLIBS += -lunicorn
 TARGET = unicorn_loader
 OBJS = unicorn_loader.o AflUnicornEngine.o
 
