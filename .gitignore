@@ -1,0 +1,4 @@
+goorm.manifest
+
+src/*.o
+src/unicorn_loader

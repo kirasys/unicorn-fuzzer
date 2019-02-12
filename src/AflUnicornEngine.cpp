@@ -103,8 +103,9 @@ void AflUnicornEngine::_map_segments(const json& segment_list, const char* conte
             }
         }
         
-        // Map memory into the address space
+        uc_free(regions);
         
+        // Map memory into the address space
         if(!pass){
             if(overlap_start)             // Partial overlap (start)
                 AflUnicornEngine::_map_segment(seg_name, tmp, seg_end - tmp, seg_perms);
