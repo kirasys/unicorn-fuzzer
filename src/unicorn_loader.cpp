@@ -5,5 +5,5 @@
 #include "AflUnicornEngine.h"
 
 int main(int argc, char* argv[]){
-    AflUnicornEngine afl = AflUnicornEngine(argv[1]);
+    AflUnicornEngine afl = AflUnicornEngine(argv[1], true, true);
 }
