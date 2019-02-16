@@ -28,13 +28,14 @@ AflUnicornEngine::AflUnicornEngine(const std::string context_dir, bool enable_tr
         _error("Couldn't find infomation in indexfile.");
     
     uc_err err;
-        
+    
     // Only support ARCH_86 & MODE_32 now
-    err = uc_open(UC_ARCH_X86, UC_MODE_32, &this->uc);
+    this->uc_set = _get_arch_and_mode(context["arch"]["arch"]);
+    err = uc_open(uc_set.arch, uc_set.mode, &this->uc);
     uc_assert_success(err);
     
     // Load the registers
-    std::map<std::string, int> reg_map = AflUnicornEngine::_get_register_map(X86);
+    Regmap reg_map = AflUnicornEngine::_get_register_map(uc_set.mode);
     
     for(auto &reg: reg_map){
         uint64_t reg_value = context["regs"][reg.first].get<uint64_t>();
@@ -150,12 +151,34 @@ void AflUnicornEngine::_map_segments(const json& segment_list, const std::string
 }
 
 void AflUnicornEngine::dump_regs() const {
+    Regmap reg_map = AflUnicornEngine::_get_register_map(this->uc_set.mode);
     
+    for(const auto &reg: reg_map){
+        uint64_t reg_value;
+        uc_err err = uc_reg_read(this->uc, reg.second, &reg_value);
+        uc_assert_success(err);
+        
+        uc_mode mode = this->uc_set.mode;
+        switch(mode){
+            case UC_MODE_32:
+                printf(">>> %s : %x \n",reg.first.c_str(), static_cast<uint32_t>(reg_value));
+                break;
+            case UC_MODE_64:
+                printf(">>> %s : %lx \n",reg.first.c_str(), static_cast<uint64_t>(reg_value));
+                break;
+        }
+    }
 }
 
-std::map<std::string, int> AflUnicornEngine::_get_register_map(int arch) const{
-        std::map<std::string, int> r_map;
-        if(arch == X86){
+uc_settings AflUnicornEngine::_get_arch_and_mode(const std::string arch_str) const{
+    static std::map<std::string, uc_settings> arch_map = {{"x86", {UC_ARCH_X86, UC_MODE_32}}};
+    
+    return arch_map[arch_str];
+}
+
+std::map<std::string, int> AflUnicornEngine::_get_register_map(uc_mode mode) const{
+        Regmap r_map;
+        if(mode == UC_MODE_32){
             r_map["eax"] = UC_X86_REG_EAX;
             r_map["ebx"] = UC_X86_REG_EBX;
             r_map["ecx"] = UC_X86_REG_ECX;

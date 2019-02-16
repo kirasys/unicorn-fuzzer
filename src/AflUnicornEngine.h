@@ -32,9 +32,17 @@ extern void _error(const char* err_msg);
 
 using json = nlohmann::json;
 
+typedef std::map<std::string, int> Regmap;
+
+struct uc_settings{
+    uc_arch arch;
+    uc_mode mode;
+};
+
 class AflUnicornEngine{
 private:
     uc_engine *uc;
+    uc_settings uc_set;
     bool debug_trace;
     
 public:
@@ -42,7 +50,8 @@ public:
     void _map_segments(const json& segment_list, const std::string context_dir);
     void _map_segment(const std::string name, const uint64_t address, const uint64_t size, int perms);
     void dump_regs() const;
-    std::map<std::string, int> _get_register_map(int arch) const;
+    uc_settings _get_arch_and_mode(const std::string arch_str) const;
+    Regmap _get_register_map(uc_mode mode) const;
 };
 
 #endif

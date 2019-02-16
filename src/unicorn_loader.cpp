@@ -14,4 +14,6 @@ int main(int argc, char* argv[]){
     bool debug_trace = strcmp(argv[3], "true")? false : true;
     
     AflUnicornEngine afl = AflUnicornEngine(context_dir, enable_trace, debug_trace);
+    
+    
 }
