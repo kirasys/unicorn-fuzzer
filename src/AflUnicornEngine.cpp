@@ -7,12 +7,15 @@ const uint64_t UNICORN_PAGE_SIZE = 0x1000;
 inline uint64_t ALIGN_PAGE_DOWN(uint64_t x) { return x & ~(UNICORN_PAGE_SIZE - 1); }
 inline uint64_t ALIGN_PAGE_UP(uint64_t x) { return (x + UNICORN_PAGE_SIZE - 1) & ~(UNICORN_PAGE_SIZE-1); }
 
-AflUnicornEngine::AflUnicornEngine(const char* context_dir, bool enable_trace, bool _debug_trace)
+void _error(const char* err_msg){
+    std::cerr << err_msg;
+    exit(-1);
+}
+
+AflUnicornEngine::AflUnicornEngine(const std::string context_dir, bool enable_trace, bool _debug_trace) // enable_trace mode not surpported now.
     : debug_trace(_debug_trace){
     // Making full path of index file
-    std::string index_dir(context_dir);
-    index_dir.append("/");
-    index_dir.append(INDEX_FILE_NAME);
+    std::string index_dir = context_dir + "/" + INDEX_FILE_NAME;
     DEBUG("Loading process context index from %s", index_dir.c_str());
     
     // Read _index.json file
@@ -21,20 +24,24 @@ AflUnicornEngine::AflUnicornEngine(const char* context_dir, bool enable_trace, b
     index_file >> context;
     
     if(context["arch"] == 0 || context["regs"] == 0 || \
-         context["segments"] == 0){
-        std::cerr << "Couldn't find infomation in indexfile. "<< std::endl;
-        return;
-    }
+         context["segments"] == 0)
+        _error("Couldn't find infomation in indexfile.");
     
+    uc_err err;
         
     // Only support ARCH_86 & MODE_32 now
-    uc_open(UC_ARCH_X86, UC_MODE_32, &this->uc);
+    err = uc_open(UC_ARCH_X86, UC_MODE_32, &this->uc);
+    uc_assert_success(err);
     
     // Load the registers
     std::map<std::string, int> reg_map = AflUnicornEngine::_get_register_map(X86);
     
-    for(auto &reg: reg_map)
-        uc_reg_write(this->uc, reg.second, &context["regs"][reg.first]);
+    for(auto &reg: reg_map){
+        uint64_t reg_value = context["regs"][reg.first].get<uint64_t>();
+        
+        err = uc_reg_write(this->uc, reg.second, &reg_value);
+        uc_assert_success(err);   
+    }
         
     // Map the memory segment and load data
     AflUnicornEngine::_map_segments(context["segments"], context_dir);
@@ -48,11 +55,13 @@ void AflUnicornEngine::_map_segment(const std::string name, const uint64_t addre
     DEBUG("Mapping segment from %lx - %lx with perm=%d :%s",\
           mem_start_aligned, mem_end_aligned, perms, name.c_str());
     
-    if(mem_start_aligned < mem_end_aligned)
-        uc_mem_map(this->uc, mem_start_aligned, mem_end_aligned - mem_start_aligned, perms);
+    if(mem_start_aligned < mem_end_aligned){
+        uc_err err = uc_mem_map(this->uc, mem_start_aligned, mem_end_aligned - mem_start_aligned, perms);
+        uc_assert_success(err);
+    }
 }
 
-void AflUnicornEngine::_map_segments(const json& segment_list, const char* context_dir){
+void AflUnicornEngine::_map_segments(const json& segment_list, const std::string context_dir){
     for(const auto &segment: segment_list){
         std::string seg_name = segment["name"].get<std::string>();
         uint64_t seg_start = segment["start"].get<uint64_t>();
@@ -117,10 +126,34 @@ void AflUnicornEngine::_map_segments(const json& segment_list, const char* conte
         else
             DEBUG("Segment %s already mapped. Moving on.", seg_name.c_str());
         
+        // Load the content (if available)
+        if(segment["content_file"].get<std::string>().length() > 0){
+            std::string content_file_path = context_dir + "/" + segment["content_file"].get<std::string>();
+            
+            std::ifstream context_file(content_file_path.c_str(), std::ios::binary);
+            if(!context_file)
+                _error("Couldn't find context file. (Missing in context dir)");
+            
+            uLong content_size = seg_end - seg_start;
+            Bytef* dcompr = new Bytef[content_size];
+            std::vector<Bytef> compr(std::istreambuf_iterator<char>(context_file), {}); // Read all compressed data into buffer.
+            
+            int zerr = uncompress(dcompr, &content_size, reinterpret_cast<Bytef*>(compr.data()), compr.size());
+            assert(zerr == Z_OK);
+            
+            uc_err err = uc_mem_write(this->uc, seg_start, dcompr, content_size);
+            uc_assert_success(err);
+            
+            delete []dcompr;
+        }
     }
 }
 
-std::map<std::string, int> AflUnicornEngine::_get_register_map(int arch){
+void AflUnicornEngine::dump_regs() const {
+    
+}
+
+std::map<std::string, int> AflUnicornEngine::_get_register_map(int arch) const{
         std::map<std::string, int> r_map;
         if(arch == X86){
             r_map["eax"] = UC_X86_REG_EAX;
@@ -132,7 +165,7 @@ std::map<std::string, int> AflUnicornEngine::_get_register_map(int arch){
             r_map["ebp"] = UC_X86_REG_EBP;
             r_map["esp"] = UC_X86_REG_ESP;
             r_map["eip"] = UC_X86_REG_EIP;
-            r_map["efl"] = UC_X86_REG_EFLAGS;
+            r_map["eflags"] = UC_X86_REG_EFLAGS;
             // Segment registers are removed
             // Set a segment registers in another function
         }

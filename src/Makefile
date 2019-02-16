@@ -4,7 +4,7 @@ CFLAGS  = -g -W -std=c++11
 CFLAGS += -L ../lib -I ../include
 
 LDLIBS  = -pthread
-LDLIBS += -lunicorn
+LDLIBS += -lunicorn -lz
 TARGET = unicorn_loader
 OBJS = unicorn_loader.o AflUnicornEngine.o
 
