@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 #include "AflUnicornEngine.h"
+#include "UnicornSimpleHeap.h"
 
 int main(int argc, char* argv[]){
     if(argc < 4){
@@ -14,6 +15,8 @@ int main(int argc, char* argv[]){
     bool debug_trace = strcmp(argv[3], "true")? false : true;
     
     AflUnicornEngine afl = AflUnicornEngine(context_dir, enable_trace, debug_trace);
+    UnicornSimpleHeap uc_heap = UnicornSimpleHeap(afl.get_uc(), true);
+    uc_heap.malloc(0x400);
     
-    
+    //afl.dump_regs();
 }
