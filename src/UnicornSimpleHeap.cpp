@@ -4,11 +4,12 @@ UnicornSimpleHeap::UnicornSimpleHeap(uc_engine* _uc, bool _debug_trace)
         : uc(_uc), debug_trace(_debug_trace) {}
 
 uint32_t UnicornSimpleHeap::malloc(uint32_t size){
-        // Figure out the overall size to be allocated/mapped
-        //    - Allocate at least 1 4k page of memory to make Unicorn happy
-        //    - Add guard pages at the start and end of the region
+    // Figure out the overall size to be allocated/mapped
+    //    - Allocate at least 1 4k page of memory to make Unicorn happy
+    //    - Add guard pages at the start and end of the region
     uint32_t total_chunk_size = UNICORN_PAGE_SIZE + ALIGN_PAGE_UP(size) + UNICORN_PAGE_SIZE;
     
+    // Very simple Allocating algorithm..
     HeapChunk chunk = {0,0};
     for(uint32_t addr = HEAP_MIN_ADDR; addr < HEAP_MAX_ADDR; addr += UNICORN_PAGE_SIZE){
         uc_err err = uc_mem_map(this->uc, addr, total_chunk_size, UC_PROT_WRITE | UC_PROT_WRITE);
