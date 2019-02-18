@@ -26,8 +26,6 @@ do {                                                                \
 
 #define uc_assert_success(err)  uc_assert_err(UC_ERR_OK, err)
 
-#define X86 0
-
 extern void _error(const char* err_msg);
 
 using json = nlohmann::json;

@@ -11,6 +11,17 @@
   if (debug_trace) { printf(fmt, ##__VA_ARGS__); putchar('\n'); } \
 } while (0)
 
+#define uc_assert_err(expect, err)                                  \
+do {                                                                \
+    uc_err __err = err;                                             \
+    if (__err != expect) {                                          \
+        fprintf(stderr, "%s", uc_strerror(__err));                  \
+        exit(1);                                                    \
+    }                                                               \
+} while (0)
+
+#define uc_assert_success(err)  uc_assert_err(UC_ERR_OK, err)
+
 inline uint64_t ALIGN_PAGE_DOWN(uint64_t x) { return x & ~(UNICORN_PAGE_SIZE - 1); }
 inline uint64_t ALIGN_PAGE_UP(uint64_t x) { return (x + UNICORN_PAGE_SIZE - 1) & ~(UNICORN_PAGE_SIZE-1); }
 
@@ -33,6 +44,7 @@ private:
 public:
     UnicornSimpleHeap(uc_engine* _uc, bool _debug_trace);
     uint32_t malloc(uint32_t size);
+    bool free(uint32_t addr);
 };
 
 #endif
