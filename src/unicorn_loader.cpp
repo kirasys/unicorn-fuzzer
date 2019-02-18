@@ -38,9 +38,9 @@ int main(int argc, char* argv[]){
     uc_hook trace;
     uc_hook_add(afl.get_uc(), &trace, UC_HOOK_CODE, reinterpret_cast<void*>(unicorn_hook_instruction), NULL, 1, 0);
     
-    uint32_t eip = start_address;
+    uint64_t eip = start_address;
     while(eip != end_address){
-        uc_err err = uc_emu_start(afl.get_uc(), eip, 0xffffffff, 0, 0);
+        uc_err err = uc_emu_start(afl.get_uc(), eip, end_address, 0, 0);
         if(err){
             fprintf(stderr, "%s", uc_strerror(err));
             afl.dump_regs();
