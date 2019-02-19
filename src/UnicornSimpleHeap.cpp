@@ -1,5 +1,9 @@
 #include "UnicornSimpleHeap.h"
 
+bool Compare_Chunk(const HeapChunk& rhs, const uint32_t& addr){
+    return addr == rhs.addr ? true : false;
+}
+
 UnicornSimpleHeap::UnicornSimpleHeap(uc_engine* _uc, bool _debug_trace) 
         : uc(_uc), debug_trace(_debug_trace) {}
 
@@ -24,9 +28,9 @@ uint32_t UnicornSimpleHeap::malloc(uint32_t size){
     if(!chunk.addr) return 0;
     
     // Change the guard page permission to readonly.
-    err = uc_mem_protect(this->uc, chunk.addr + chunk.size - UNICORN_PAGE_SIZE, UNICORN_PAGE_SIZE, UC_PROT_READ);
+    uc_err err = uc_mem_protect(this->uc, chunk.addr + chunk.size - UNICORN_PAGE_SIZE, UNICORN_PAGE_SIZE, UC_PROT_READ);
     uc_assert_success(err);
-    
+
     this->chunks.push_back(chunk);
     
     uint32_t data_addr = chunk.addr + (UNICORN_PAGE_SIZE - (size & 0xfff));
@@ -38,13 +42,17 @@ uint32_t UnicornSimpleHeap::malloc(uint32_t size){
 
 bool UnicornSimpleHeap::free(uint32_t addr){
     addr -= (addr & 0xfff);
-    std::vector<int>::iterator chunk_itr = find(chunks.begin(), chunks.end(), addr);
+    std::vector<HeapChunk>::iterator chunk_itr = std::find_if(chunks.begin(), chunks.end(), \
+                                                   std::bind(Compare_Chunk, std::placeholders::_1, addr));
     
     // Something went wrong. (double free or memory corruption?)
     if(chunk_itr == chunks.end())
         return false;
     
-    uc_mem_unmap(this->uc, addr, chunk_itr->size);
+    DEBUG("Freeing 0x%x byte chunk @ 0x%x", chunk_itr->size, addr);
+    uc_err err = uc_mem_unmap(this->uc, addr, chunk_itr->size);
+    uc_assert_success(err);
+    
     chunks.erase(chunk_itr);
     
     return true;

@@ -1,0 +1,190 @@
+{
+    "arch": {
+        "arch": "x86"
+    },
+    "regs": {
+        "esi": 0,
+        "eip": 134513744,
+        "ebp": 4288883064,
+        "esp": 4288883064,
+        "es": 43,
+        "ecx": 18446744072916876303,
+        "ebx": 18446744073566154752,
+        "eax": 1,
+        "eflags": 582,
+        "gs": 99,
+        "ss": 43,
+        "ds": 43,
+        "cs": 35,
+        "edi": 0,
+        "fs": 0,
+        "edx": 18446744073703467428
+    },
+    "segments": [
+        {
+            "end": 134516736,
+            "start": 134512640,
+            "name": "/workspace/unicorn-loader/tests/heap_test",
+            "content_file": "83b1f9a1ea63e95372bd0f2dd335058a.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": true
+            }
+        },
+        {
+            "end": 134520832,
+            "start": 134516736,
+            "name": "/workspace/unicorn-loader/tests/heap_test",
+            "content_file": "e28aca96c3eacc5eca87f1f5d06bd7ec.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 134524928,
+            "start": 134520832,
+            "name": "/workspace/unicorn-loader/tests/heap_test",
+            "content_file": "6097cd9bda3c2d60b1ba1096f27f1384.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4149813248,
+            "start": 4149809152,
+            "name": "",
+            "content_file": "2bf9dd2b956e64b53e11cfaad1a4c235.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151562240,
+            "start": 4149813248,
+            "name": "/lib/i386-linux-gnu/libc-2.19.so",
+            "content_file": "8c702b3964be290f5a49db4eebbba71c.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": true
+            }
+        },
+        {
+            "end": 4151570432,
+            "start": 4151562240,
+            "name": "/lib/i386-linux-gnu/libc-2.19.so",
+            "content_file": "bb98aeb7bb8f149d9ddadd5271606643.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151574528,
+            "start": 4151570432,
+            "name": "/lib/i386-linux-gnu/libc-2.19.so",
+            "content_file": "c51ea9abf4975242da992755c1d51fe0.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151586816,
+            "start": 4151574528,
+            "name": "",
+            "content_file": "5f49aa6700f65d9da2a3a543fb27aa6c.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151640064,
+            "start": 4151635968,
+            "name": "",
+            "content_file": "8474b07ecc8fac5a8790e1ce0c49bbce.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151652352,
+            "start": 4151640064,
+            "name": "[vvar]",
+            "content_file": "",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151656448,
+            "start": 4151652352,
+            "name": "[vdso]",
+            "content_file": "85e6d588b51afc87900cfcb4b0364ff6.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": true
+            }
+        },
+        {
+            "end": 4151787520,
+            "start": 4151656448,
+            "name": "/lib/i386-linux-gnu/ld-2.19.so",
+            "content_file": "0b97f6f577375f32ef5e2394491fed0e.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": true
+            }
+        },
+        {
+            "end": 4151791616,
+            "start": 4151787520,
+            "name": "/lib/i386-linux-gnu/ld-2.19.so",
+            "content_file": "76fda22afc35a46e2b141980618a16e6.bin",
+            "permissions": {
+                "w": false,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4151795712,
+            "start": 4151791616,
+            "name": "/lib/i386-linux-gnu/ld-2.19.so",
+            "content_file": "d825ecca9d20e53ad42ee2571ad1381c.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        },
+        {
+            "end": 4288892928,
+            "start": 4288757760,
+            "name": "[stack]",
+            "content_file": "9be1067321582f8e04053531c1021ae9.bin",
+            "permissions": {
+                "w": true,
+                "r": true,
+                "x": false
+            }
+        }
+    ]
+}

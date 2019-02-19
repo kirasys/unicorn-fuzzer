@@ -3,6 +3,8 @@
 
 #include <unicorn/unicorn.h>
 #include <iostream>
+#include <functional>
+#include <algorithm>
 #include <vector>
 
 #define UNICORN_PAGE_SIZE 0x1000
@@ -25,17 +27,12 @@ do {                                                                \
 inline uint64_t ALIGN_PAGE_DOWN(uint64_t x) { return x & ~(UNICORN_PAGE_SIZE - 1); }
 inline uint64_t ALIGN_PAGE_UP(uint64_t x) { return (x + UNICORN_PAGE_SIZE - 1) & ~(UNICORN_PAGE_SIZE-1); }
 
-
 struct HeapChunk{
     uint32_t addr;
     uint32_t size;
-    
-    bool operator==(const uint32_t& rhs) const
-    {
-        return addr == rhs? true : false;
-    }
 };
 
+bool Compare_Chunk(const HeapChunk& rhs, const uint32_t& addr);
 
 class UnicornSimpleHeap{
 private:
