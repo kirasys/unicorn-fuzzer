@@ -23,10 +23,6 @@ uint32_t UnicornSimpleHeap::malloc(uint32_t size){
     // Something went wrong.
     if(!chunk.addr) return 0;
     
-    // Chunk size will be used in the free function.
-    uc_err err = uc_mem_write(this->uc, chunk.addr-4, &total_chunk_size, sizeof(total_chunk_size));
-    uc_assert_success(err);
-    
     // Change the guard page permission to readonly.
     err = uc_mem_protect(this->uc, chunk.addr + chunk.size - UNICORN_PAGE_SIZE, UNICORN_PAGE_SIZE, UC_PROT_READ);
     uc_assert_success(err);
@@ -41,10 +37,15 @@ uint32_t UnicornSimpleHeap::malloc(uint32_t size){
 
 
 bool UnicornSimpleHeap::free(uint32_t addr){
-    uint32_t chunksize;
+    addr -= (addr & 0xfff);
+    std::vector<int>::iterator chunk_itr = find(chunks.begin(), chunks.end(), addr);
     
-    uc_err err = uc_mem_read(this->uc, addr-4, &chunksize, sizeof(chunksize));
-    uc_assert_success(err);
+    // Something went wrong. (double free or memory corruption?)
+    if(chunk_itr == chunks.end())
+        return false;
+    
+    uc_mem_unmap(this->uc, addr, chunk_itr->size);
+    chunks.erase(chunk_itr);
     
     return true;
 }

@@ -29,7 +29,13 @@ inline uint64_t ALIGN_PAGE_UP(uint64_t x) { return (x + UNICORN_PAGE_SIZE - 1) &
 struct HeapChunk{
     uint32_t addr;
     uint32_t size;
+    
+    bool operator==(const uint32_t& rhs) const
+    {
+        return addr == rhs? true : false;
+    }
 };
+
 
 class UnicornSimpleHeap{
 private:

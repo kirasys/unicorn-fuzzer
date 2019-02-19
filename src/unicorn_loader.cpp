@@ -42,8 +42,8 @@ int main(int argc, char* argv[]){
     while(eip != end_address){
         uc_err err = uc_emu_start(afl.get_uc(), eip, end_address, 0, 0);
         if(err){
-            fprintf(stderr, "%s", uc_strerror(err));
             afl.dump_regs();
+            afl.force_crash(err);
             return 0;
         }
         uc_reg_read(afl.get_uc(), UC_X86_REG_EIP, &eip);

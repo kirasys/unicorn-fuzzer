@@ -4,12 +4,17 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+
 #include <unicorn/unicorn.h>
 #include <zlib.h>
 #include <nlohmann/json.hpp>
-#include <map>
-#include <cstdint>
+
 #include <cstdio>
+#include <cstdint>
+#include <csignal>
 
 #define DEBUG(fmt,...) do { \
   if (debug_trace) { printf(fmt, ##__VA_ARGS__); putchar('\n'); } \
@@ -48,6 +53,7 @@ public:
     void _map_segments(const json& segment_list, const std::string context_dir);
     void _map_segment(const std::string name, const uint64_t address, const uint64_t size, int perms);
     void dump_regs() const;
+    void force_crash(uc_err err) const;
     uc_settings _get_arch_and_mode(const std::string arch_str) const;
     Regmap _get_register_map(uc_mode mode) const;
     

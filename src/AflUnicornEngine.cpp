@@ -196,6 +196,19 @@ std::map<std::string, int> AflUnicornEngine::_get_register_map(uc_mode mode) con
     return r_map;
 }
 
+void AflUnicornEngine::force_crash(uc_err err) const{
+    static std::vector<uc_err> mem_errors = {UC_ERR_READ_UNMAPPED, UC_ERR_READ_PROT, UC_ERR_READ_UNALIGNED, \
+                                         UC_ERR_WRITE_UNMAPPED, UC_ERR_WRITE_PROT, UC_ERR_WRITE_UNALIGNED, \
+                                         UC_ERR_FETCH_UNMAPPED, UC_ERR_FETCH_PROT, UC_ERR_FETCH_UNALIGNED};
+    
+    if(std::find(mem_errors.begin(), mem_errors.end(), err) != mem_errors.end())
+        std::raise(SIGSEGV);
+    else if(err == UC_ERR_INSN_INVALID)
+        std::raise(SIGILL);
+    else
+        std::raise(SIGABRT);
+}
+
 uc_engine* AflUnicornEngine::get_uc() const{
     return this->uc;
 }
